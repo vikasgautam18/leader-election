@@ -81,7 +81,7 @@ public class LeaderElection implements Watcher {
     }
 
     /**
-     *
+     * A small utility method to print properties
      *
      */
     public static void printProperties(Map<String, String> properties){
