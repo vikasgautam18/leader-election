@@ -31,8 +31,12 @@ public class LeaderElection implements Watcher {
 
         LeaderElection leaderElection = new LeaderElection();
         try {
+
             leaderElection.connectToZookeeper();
             leaderElection.run();
+            leaderElection.close();
+            logger.info("Disconnected from Zookeeper");
+
         } catch (IOException | InterruptedException e) {
             e.printStackTrace();
         }
@@ -52,7 +56,10 @@ public class LeaderElection implements Watcher {
         synchronized (zooKeeper){
             zooKeeper.wait();
         }
+    }
 
+    public void close() throws InterruptedException {
+        zooKeeper.close();
     }
     /**
      *
@@ -64,6 +71,11 @@ public class LeaderElection implements Watcher {
             case None:
                 if(watchedEvent.getState() == Event.KeeperState.SyncConnected){
                     logger.info("Connected to zookeeper successfully");
+                } else {
+                    synchronized (zooKeeper){
+                        logger.info("Received disconnection request... ");
+                        zooKeeper.notifyAll();
+                    }
                 }
         }
     }
