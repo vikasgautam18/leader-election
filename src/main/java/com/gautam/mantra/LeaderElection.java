@@ -21,7 +21,7 @@ public class LeaderElection implements Watcher {
     private ZooKeeper zooKeeper;
     private String currentZnode;
 
-    public LeaderElection(){
+    public LeaderElection() {
         ClassLoader loader = Thread.currentThread().getContextClassLoader();
         InputStream inputStream = loader.getResourceAsStream("leader-election.yml");
         properties = yaml.load(inputStream);
@@ -43,11 +43,11 @@ public class LeaderElection implements Watcher {
         } catch (IOException | InterruptedException | KeeperException e) {
             e.printStackTrace();
         }
-
     }
 
     /**
      * method to connect to zk
+     *
      * @throws IOException throws an IO Exception if ZK is not reachable
      */
     public void connectToZookeeper() throws IOException {
@@ -56,7 +56,7 @@ public class LeaderElection implements Watcher {
     }
 
     public void run() throws InterruptedException {
-        synchronized (zooKeeper){
+        synchronized (zooKeeper) {
             zooKeeper.wait();
         }
     }
@@ -64,8 +64,8 @@ public class LeaderElection implements Watcher {
     public void close() throws InterruptedException {
         zooKeeper.close();
     }
+
     /**
-     *
      * @param watchedEvent ZK event watcher implementation
      */
     @Override
@@ -84,12 +84,17 @@ public class LeaderElection implements Watcher {
 
     /**
      * A small utility method to print properties
-     *
      */
-    public static void printProperties(Map<String, String> properties){
+    public static void printProperties(Map<String, String> properties) {
         properties.forEach((k, v) -> System.out.println(k + " -> " + v));
     }
 
+    /**
+     * This method is used to nominate for becoming a leader
+     *
+     * @throws KeeperException      a possible exception
+     * @throws InterruptedException a possible exception
+     */
     public void nominateForElection() throws KeeperException, InterruptedException {
         String prefix = properties.get("electionNamespace") + "/c_";
         String znodeFullPath = zooKeeper.create(prefix, new byte[]{},
@@ -99,7 +104,12 @@ public class LeaderElection implements Watcher {
         this.currentZnode = znodeFullPath.replace("/election/", "");
     }
 
-
+    /**
+     * This method contains the logic to elect a leader
+     *
+     * @throws KeeperException      a possible exception
+     * @throws InterruptedException a possible exception
+     */
     public void electALeader() throws KeeperException, InterruptedException {
         List<String> children = zooKeeper.getChildren(properties.get("electionNamespace"), false);
 
