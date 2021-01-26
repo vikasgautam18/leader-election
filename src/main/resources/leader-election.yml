@@ -1,3 +1,4 @@
 zookeeperAddress: localhost:2181
 sessionTimeout: "3000"
 electionNamespace: "/election"
+demoNamespace: "/target_znode"
