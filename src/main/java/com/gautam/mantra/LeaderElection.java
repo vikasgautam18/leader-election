@@ -70,15 +70,17 @@ public class LeaderElection implements Watcher {
      */
     @Override
     public void process(WatchedEvent watchedEvent) {
-        if (watchedEvent.getType() == Event.EventType.None) {
-            if (watchedEvent.getState() == Event.KeeperState.SyncConnected) {
-                logger.info("Connected to zookeeper successfully");
-            } else {
-                synchronized (zooKeeper) {
-                    logger.info("Received disconnection request... ");
-                    zooKeeper.notifyAll();
+        switch (watchedEvent.getType()) {
+            case None:
+                if (watchedEvent.getState() == Event.KeeperState.SyncConnected) {
+                    logger.info("Connected to zookeeper successfully");
+                } else {
+                    synchronized (zooKeeper) {
+                        logger.info("Received disconnection request... ");
+                        zooKeeper.notifyAll();
+                    }
                 }
-            }
+                break;
         }
     }
 
